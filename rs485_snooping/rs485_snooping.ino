@@ -5,7 +5,7 @@
 
 #include <MsTimer2.h>
 #include <SD.h>
-#define MESSAGE_GAP_TIMEOUT_IN_MS 75
+#define MESSAGE_GAP_TIMEOUT_IN_MS 150
 
 
 
@@ -60,16 +60,18 @@ void loop() {
 
   if (Serial.available() > 0) {
     received = Serial.read();
-    
+    RecvBuffer[recvIndex++] = received;
   }
+  
 
     // first time we get an empty buffer after receiving stuff:
     // this could be the end of the message, (re)start the end-of-message detection timer.
     if (recvIndex > 0) {
 
-      MsTimer2::stop();
+    if (!timerStarted) {
       MsTimer2::start();
       timerStarted = true;
+    }
   }
 
   // If the timer expired and positioned this var, we should now dump the received message
@@ -112,8 +114,5 @@ void loop() {
     // reset index for next message
     recvIndex = 0;
   }
-
-
-  RecvBuffer[recvIndex++] = received;
 }
 
