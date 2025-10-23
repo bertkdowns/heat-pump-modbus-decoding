@@ -4,23 +4,13 @@
 #include <SPI.h>
 
 #include <MsTimer2.h>
+#include <SD.h>
+#define MESSAGE_GAP_TIMEOUT_IN_MS 75
 
-#define MESSAGE_GAP_TIMEOUT_IN_MS 5
-#define LED_TOGGLE_MSGS 50
 
-byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-};
-IPAddress local_ip(192, 168, 0, 40);
-//IPAddress remote_ip(192, 168, 0, 11);
-// Use broadcast address, to not have to care about the IP of the receiver.
-IPAddress remote_ip(255, 255, 255, 255);
 
-unsigned int localPort = 8888;
-
-char RecvBuffer[256];     
-
-EthernetUDP Udp;
+byte RecvBuffer[700];
+#define SD_CS 10
 
 unsigned int recvIndex = 0;
 unsigned long msgIndex = 0;
@@ -30,33 +20,31 @@ char receiveTimeString[32];
 char msgIndexString[32];
 
 const byte LED_PIN = 13;
+File logFile;
 
-void setup()
-{
-  Ethernet.begin(mac, local_ip);
-  Udp.begin(localPort);
-  
-  Serial.begin(4800); // Baud rate of modbus
-  
-  pinMode(LED_PIN, OUTPUT);
+#define FILE_NAME "datalogs.csv"
+
+void setup() {
+
+  Serial.begin(4800);  // Baud rate of modbus
 
   // set an end-of-message detection timeout of 5ms
   MsTimer2::set(MESSAGE_GAP_TIMEOUT_IN_MS, onTimer);
 
-
-
+pinMode(LED_BUILTIN, OUTPUT);
   // Setup SD Card for logging
-   if (!SD.begin(SD_CS)) {
-   Serial.println("SD card failed or not present!");
-   while (1);
- }
+  if (!SD.begin(SD_CS)) {
+    Serial.println("SD card failed or not present!");
+    while (1)
+      ;
+  }
 
- logFile = SD.open("datalogs.csv", FILE_WRITE);
- if (logFile && logFile.size() == 0) {
-   // Header row
-   logFile.println("UART Data");
- }
- logFile.close();
+  logFile = SD.open(FILE_NAME, FILE_WRITE);
+  if (logFile && logFile.size() == 0) {
+    // Header row
+    logFile.println("UART Data");
+  }
+  logFile.close();
 }
 
 bool dumpData = false;
@@ -64,55 +52,68 @@ bool timerStarted = false;
 
 // If this timer expires, this means no additional character was received for a while: notify main loop
 void onTimer() {
-  dumpData = true;        
+  dumpData = true;
 }
 
-void loop()
-{
-   char received;
+void loop() {
+  char received;
 
-   if (Serial.available() > 0) {
-      received = Serial.read();     
-      RecvBuffer[recvIndex++] = received;
-   }
+  if (Serial.available() > 0) {
+    received = Serial.read();
+    
+  }
 
     // first time we get an empty buffer after receiving stuff:
-    // this could be the end of the message, (re)start the end-of-message detection timer. 
-    if (recvIndex>0) {
+    // this could be the end of the message, (re)start the end-of-message detection timer.
+    if (recvIndex > 0) {
 
-      if (!timerStarted){
-        MsTimer2::start();
-        timerStarted = true;
-      }
-    } 
-
-   // If the timer expired and positioned this var, we should now dump the received message
-   // into a UDP packet to the remote host/logger.
-   if (dumpData) {
-      receiveTime = micros() - MESSAGE_GAP_TIMEOUT_IN_MS*1000; 
-      
-      // reinitialize vars for next detection/dump
-      dumpData = false;
       MsTimer2::stop();
-      timerStarted = false;   
+      MsTimer2::start();
+      timerStarted = true;
+  }
 
-      msgIndex++ ;
+  // If the timer expired and positioned this var, we should now dump the received message
+  // into a UDP packet to the remote host/logger.
+  if (dumpData) {
+    receiveTime = micros() - MESSAGE_GAP_TIMEOUT_IN_MS * 1000;
+
+    // reinitialize vars for next detection/dump
+    dumpData = false;
+    MsTimer2::stop();
+    timerStarted = false;
+    msgIndex++;
       if (msgIndex > 999) msgIndex = 0;
-     
-      // build and send UDP message
-      Udp.beginPacket(remote_ip, 8888);
-      
-      sprintf(receiveTimeString, "%015lu:", receiveTime);
-      Udp.write(receiveTimeString, strlen(receiveTimeString));
 
-      sprintf(msgIndexString, "%04lu:", msgIndex);
-      Udp.write(msgIndexString, strlen(msgIndexString));
-      
-      Udp.write(RecvBuffer, recvIndex);
-    
-      Udp.endPacket();
+    logFile = SD.open(FILE_NAME, FILE_WRITE);
+    if (!logFile) {
+      digitalWrite(LED_BUILTIN, HIGH);  // LED is on if SD card error
+    } else {
 
-      // reset index for next message
-      recvIndex = 0;
-   } 
-} 
+      digitalWrite(LED_BUILTIN,LOW);
+
+      logFile.print(receiveTime); logFile.print(",");
+      logFile.print(msgIndex); logFile.print(",");
+      
+      // Write the buffer as hex
+      // Write each byte as 2 hex chars
+      for (size_t i = 0; i < recvIndex; i++) {
+        int b = (uint8_t) RecvBuffer[i]; // convert to int so we don't have to worry about sign stuff
+        if (b < (int) 0x10){ logFile.print("0");} // pad single hex digits
+        logFile.print(b, HEX);
+        logFile.print(" "); // optional spacing
+        //Serial.print(b);
+        //Serial.print(" ");
+      }
+      //Serial.println();
+      logFile.println();
+
+    }
+    logFile.close();
+    // reset index for next message
+    recvIndex = 0;
+  }
+
+
+  RecvBuffer[recvIndex++] = received;
+}
+
