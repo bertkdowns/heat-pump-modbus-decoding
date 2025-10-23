@@ -5,7 +5,7 @@
 
 #include <MsTimer2.h>
 #include <SD.h>
-#define MESSAGE_GAP_TIMEOUT_IN_MS 150
+#define MESSAGE_GAP_TIMEOUT_IN_MS 5
 
 
 
@@ -48,7 +48,6 @@ pinMode(LED_BUILTIN, OUTPUT);
 }
 
 bool dumpData = false;
-bool timerStarted = false;
 
 // If this timer expires, this means no additional character was received for a while: notify main loop
 void onTimer() {
@@ -61,17 +60,9 @@ void loop() {
   if (Serial.available() > 0) {
     received = Serial.read();
     RecvBuffer[recvIndex++] = received;
-  }
-  
-
-    // first time we get an empty buffer after receiving stuff:
-    // this could be the end of the message, (re)start the end-of-message detection timer.
-    if (recvIndex > 0) {
-
-    if (!timerStarted) {
-      MsTimer2::start();
-      timerStarted = true;
-    }
+    // Reset the timer
+    MsTimer2::stop();
+    MsTimer2::start();
   }
 
   // If the timer expired and positioned this var, we should now dump the received message
@@ -82,7 +73,6 @@ void loop() {
     // reinitialize vars for next detection/dump
     dumpData = false;
     MsTimer2::stop();
-    timerStarted = false;
     msgIndex++;
       if (msgIndex > 999) msgIndex = 0;
 
