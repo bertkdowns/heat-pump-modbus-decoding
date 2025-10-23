@@ -54,8 +54,8 @@ def parse_csv(file_path: str) -> pd.DataFrame:
                 # We want to store the address we are reading/writing to so we can line up the data.
                 request_slave_id = (int) (packet_bytes[0])
                 request_function = (int) (packet_bytes[1])
-                request_address = int.from_bytes(packet_bytes[2:4], byteorder='little')
-                print(f"Request at index {index}: slave_id={request_slave_id}, function={request_function}, address={request_address}")
+                request_address = int.from_bytes(packet_bytes[2:4], byteorder='big')
+                #print(f"Request at index {index}: slave_id={request_slave_id}, function={request_function}, address={request_address}")
                 continue
 
             # Okay, if we 've got this far, we actually have some data.
@@ -75,6 +75,10 @@ def parse_csv(file_path: str) -> pd.DataFrame:
                     continue
                 # Now extract the register values. They are 2 bytes each.
                 num_registers = byte_count // 2
+                available_values = (len(data) - 3) // 2
+                if num_registers != available_values:
+                    print(f"Number of registers mismatch at index {index}: expected {num_registers}, got {available_values}")
+                    continue
                 for i in range(num_registers):
                     register_address = request_address + i
                     register_value = int.from_bytes(packet_bytes[3 + i*2: 5 + i*2], byteorder='big')
@@ -90,8 +94,12 @@ def parse_csv(file_path: str) -> pd.DataFrame:
                 # Byte Count (1 byte) (should be Quantity * 2)
                 # Data starts on byte 8 (index 7)
                 # There won't be a previous request to refer to, so we have to get the address from here.
-                starting_address = int.from_bytes(packet_bytes[2:4], byteorder='little')
+                starting_address = int.from_bytes(packet_bytes[2:4], byteorder='big')
                 num_of_registers = int.from_bytes(packet_bytes[4:6], byteorder='big')
+                available_values = (len(data) - 7) // 2
+                if num_of_registers != available_values:
+                    print(f"Number of registers mismatch at index {index}: expected {num_of_registers}, got {available_values}")
+                    continue
                 for i in range(num_of_registers):
                     register_address = starting_address + i
                     register_value = int.from_bytes(packet_bytes[7 + i*2: 9 + i*2], byteorder='big')
@@ -112,7 +120,7 @@ def add_to_df(df, timestamp,slave_id, register_address, register_value):
     col = f'{slave_id}_{register_address}'
     if row not in df.index:
         df.loc[row] = pd.Series(dtype=object)
-    df.loc[row, col] = register_address
+    df.loc[row, col] = register_value
 
             
 
