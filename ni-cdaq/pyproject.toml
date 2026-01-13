@@ -7,4 +7,5 @@ requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.10.7",
     "nidaqmx>=1.4.0",
+    "paho-mqtt>=2.1.0",
 ]
