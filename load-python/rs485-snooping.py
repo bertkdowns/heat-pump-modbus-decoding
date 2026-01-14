@@ -1,7 +1,8 @@
 import serial
 import time
 import pandas as pd
-
+from parse_csv import PacketParser, PacketParseError
+from rs485_mqtt import MQTTAdapter
 # -----------------------------
 # Configuration
 # -----------------------------
@@ -27,9 +28,9 @@ ser = serial.Serial(
 # -----------------------------
 recv_buffer = bytearray()
 msg_index = 0
+start_time = time.perf_counter()
 last_rx_time = None
 
-rows = []  # collected packets
 
 print("RS485 sniffer started...")
 
@@ -37,6 +38,9 @@ print("RS485 sniffer started...")
 # Main loop
 # -----------------------------
 try:
+    parser = PacketParser()
+    mqtt_adapter = MQTTAdapter()
+    
     while True:
         now = time.perf_counter()
 
@@ -55,13 +59,16 @@ try:
             receive_time_us = int(start_time * 1_000_000)
 
             hex_payload = " ".join(f"{b:02X}" for b in recv_buffer)
+            print("[DEBUG] Captured packet:", hex_payload)
+            try:
+                device, registers = parser.parse_packet(recv_buffer)  # just for debug parsing
 
-            rows.append({
-                "receive_time_us": receive_time_us,
-                "msg_index": msg_index,
-                "uart_data": hex_payload,
-                "length": len(recv_buffer)
-            })
+                mqtt_adapter.publish_modbus_data(device,registers)
+
+            except PacketParseError as e:
+                print(f"[WARNING] Failed to parse packet: {e}")
+
+
 
             msg_index = (msg_index + 1) % 1000
             recv_buffer.clear()
@@ -74,16 +81,3 @@ except KeyboardInterrupt:
 
 finally:
     ser.close()
-
-# -----------------------------
-# Create DataFrame
-# -----------------------------
-df = pd.DataFrame(rows)
-
-print("\nCaptured packets:")
-print(df.head())
-
-# df is now available for:
-# - filtering
-# - decoding Modbus
-# - saving later if you want
