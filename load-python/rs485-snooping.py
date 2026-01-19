@@ -6,7 +6,7 @@ from rs485_mqtt import MQTTAdapter
 # -----------------------------
 # Configuration
 # -----------------------------
-SERIAL_PORT = "/dev/ttyUSB0"   # Change as needed
+SERIAL_PORT = "/dev/ttyACM0"   # Change as needed
 BAUDRATE = 4800               # Modbus RTU baud
 MESSAGE_GAP_TIMEOUT = 0.005   # 5 ms
 MAX_BUFFER_SIZE = 700
@@ -34,6 +34,11 @@ last_rx_time = None
 
 print("RS485 sniffer started...")
 
+def flip_bytes(data):
+    # not inverts the bytes, &0xff masks so that it is only one byte long.
+    flipped_bytes = bytes([~b & 0xFF for b in data])
+    return flipped_bytes
+
 # -----------------------------
 # Main loop
 # -----------------------------
@@ -51,8 +56,12 @@ try:
             if last_rx_time is None:
                 start_time = now
 
+            #data = flip_bytes(data)
+
+
             recv_buffer.extend(data[:MAX_BUFFER_SIZE - len(recv_buffer)])
             last_rx_time = now
+        
 
         # Detect message gap
         if last_rx_time is not None and (now - last_rx_time) > MESSAGE_GAP_TIMEOUT:
@@ -64,6 +73,7 @@ try:
                 device, registers = parser.parse_packet(recv_buffer)  # just for debug parsing
 
                 mqtt_adapter.publish_modbus_data(device,registers)
+                print("capytured well!")
 
             except PacketParseError as e:
                 print(f"[WARNING] Failed to parse packet: {e}")
@@ -74,7 +84,7 @@ try:
             recv_buffer.clear()
             last_rx_time = None
 
-        time.sleep(0.0005)  # small CPU relief
+        time.sleep(0.000005)  # small CPU relief
 
 except KeyboardInterrupt:
     print("\nStopping capture...")
