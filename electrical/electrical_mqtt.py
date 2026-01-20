@@ -8,18 +8,18 @@ import paho.mqtt.client as mqtt
 # =====================
 
 # Power meter TCP settings
-METER_HOST = "192.168.1.100"   # <-- change
-METER_PORT = 5025              # common SCPI port, change if needed
+METER_HOST = "192.168.1.2"   # <-- change
+METER_PORT = 3365              # common SCPI port, change if needed
 SOCKET_TIMEOUT = 5
+POWER_METER_NAME = "powermeter"  # <-- change
 
 # MQTT settings
 MQTT_BROKER = "localhost"      # <-- change
 MQTT_PORT = 1883
-MQTT_TOPIC = "power_meter/measurements"
 MQTT_CLIENT_ID = "power_meter_bridge"
 
 # Polling
-POLL_INTERVAL_SEC = 5
+POLL_INTERVAL_SEC = 1
 
 # =====================
 # TCP / SCPI FUNCTIONS
@@ -29,7 +29,7 @@ def send_command(sock, command):
     """
     Send SCPI command and read response.
     """
-    cmd = command.strip() + "\n"
+    cmd = command.strip() + "\r\n"
     sock.sendall(cmd.encode("ascii"))
 
     response = sock.recv(65535)
@@ -52,7 +52,22 @@ def parse_measurement(response):
         # Split on first space only
         if " " in field:
             key, value = field.split(" ", 1)
-            data[key.strip()] = value.strip()
+            key = key.strip()
+            value = value.strip()
+
+            # Keep Date/Time and Status as strings
+            if key in ("Date", "Time") or key.lower().startswith("status"):
+                data[key] = value
+                continue
+
+            # Try to coerce numeric-looking values to float so Telegraf/Inﬂux store them as numbers
+            try:
+                # Some values are in scientific notation like 96.9E+00
+                num = float(value)
+                data[key] = num
+            except (ValueError, TypeError):
+                # Fallback to original string (including when value is empty or non-numeric)
+                data[key] = value
         else:
             # Fallback (shouldn't normally happen)
             data[field.strip()] = None
@@ -64,8 +79,8 @@ def parse_measurement(response):
 # MQTT SETUP
 # =====================
 
-mqtt_client = mqtt.Client(client_id=MQTT_CLIENT_ID, clean_session=True)
-mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+mqtt_client = mqtt.Client(client_id=MQTT_CLIENT_ID)
+mqtt_client.connect(MQTT_BROKER, MQTT_PORT)
 mqtt_client.loop_start()
 
 
@@ -92,16 +107,17 @@ def main():
 
                 # Build MQTT payload
                 payload = {
-                    "source": "power_meter",
+                    "device": POWER_METER_NAME,
                     "timestamp": time.time(),
-                    "measurement": parsed
+                    "val1":34.12
                 }
+                #payload.update(parsed)
 
                 mqtt_client.publish(
-                    MQTT_TOPIC,
+                    f"power/{POWER_METER_NAME}/measurements",
                     json.dumps(payload),
                     qos=0,
-                    retain=False
+                    retain=True
                 )
 
                 print("Published measurement")

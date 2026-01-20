@@ -31,3 +31,13 @@ YOu can then use the hardware confgiuration utility (there should be a desktop s
 
 hopefully it auto-discovers, and then it's easy. if not, use `ip addr` to figure out what ethernet interface it's on and it's ip adress. if your device and the cDAQ is both connected to the same network, you could look at the router config to get the ip address of the cdaq, or scan the ip range of the router (e.g `nmap -sn 192.168.1.0/24` to scan 192.168.1.*). Then you can manually enter that IP and connect to it. It's pretty obvious with nmap - it'll show up as a NI CDAQ or something if you ca access it.
 
+
+
+# MQTT
+
+To view all messages sent over mqtt, run
+
+
+```
+mosquitto_sub -t "#" -v
+```
