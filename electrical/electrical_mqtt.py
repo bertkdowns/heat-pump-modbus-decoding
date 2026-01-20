@@ -19,7 +19,7 @@ MQTT_PORT = 1883
 MQTT_CLIENT_ID = "power_meter_bridge"
 
 # Polling
-POLL_INTERVAL_SEC = 1
+POLL_INTERVAL_SEC = 5
 
 # =====================
 # TCP / SCPI FUNCTIONS
@@ -32,8 +32,9 @@ def send_command(sock, command):
     cmd = command.strip() + "\r\n"
     sock.sendall(cmd.encode("ascii"))
 
-    response = sock.recv(65535)
-    return response.decode("ascii").strip()
+    with sock.makefile('rb', newline='\r\n') as sock_file:
+        line_bytes = sock_file.readline()
+    return line_bytes.decode("ascii").strip()
 
 
 def parse_measurement(response):
@@ -96,12 +97,12 @@ def main():
                 timeout=SOCKET_TIMEOUT
             ) as sock:
 
+                send_command(sock, ":MEASURE:ITEM:POWER  15,207,179,31,31,63") # Specify that we want all the data
                 # Optional: ensure headers are ON
                 send_command(sock, ":HEADER ON")
-
                 # Request measurement
                 response = send_command(sock, ":MEASURE:POWER?")
-
+                print(f"Received: {response}")
                 # Parse response
                 parsed = parse_measurement(response)
 
@@ -109,9 +110,8 @@ def main():
                 payload = {
                     "device": POWER_METER_NAME,
                     "timestamp": time.time(),
-                    "val1":34.12
                 }
-                #payload.update(parsed)
+                payload.update(parsed)
 
                 mqtt_client.publish(
                     f"power/{POWER_METER_NAME}/measurements",
