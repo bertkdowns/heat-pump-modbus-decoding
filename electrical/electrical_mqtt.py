@@ -2,19 +2,19 @@ import socket
 import json
 import time
 import paho.mqtt.client as mqtt
-
 # =====================
 # CONFIGURATION
 # =====================
 
 # Power meter TCP settings
-METER_HOST = "192.168.1.2"   # <-- change
-METER_PORT = 3365              # common SCPI port, change if needed
+METER_PORT = 3365  # This is set by the power meter 
 SOCKET_TIMEOUT = 5
-POWER_METER_NAME = "powermeter"  # <-- change
+METERS = {
+    "meter1": "192.168.1.2"
+}
 
 # MQTT settings
-MQTT_BROKER = "localhost"      # <-- change
+MQTT_BROKER = "localhost" 
 MQTT_PORT = 1883
 MQTT_CLIENT_ID = "power_meter_bridge"
 
@@ -89,9 +89,9 @@ mqtt_client.loop_start()
 # MAIN LOOP
 # =====================
 
-def main():
-    while True:
-        try:
+while True:
+    try:
+        for POWER_METER_NAME, METER_HOST in METERS.items():
             with socket.create_connection(
                 (METER_HOST, METER_PORT),
                 timeout=SOCKET_TIMEOUT
@@ -122,11 +122,8 @@ def main():
 
                 print("Published measurement")
 
-        except Exception as e:
-            print(f"Error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
-        time.sleep(POLL_INTERVAL_SEC)
+    time.sleep(POLL_INTERVAL_SEC)
 
-
-if __name__ == "__main__":
-    main()
