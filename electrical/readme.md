@@ -83,3 +83,9 @@ Otherwise, this script connects to a mqtt server and periodically sends the data
 ```
 uv run electrical_mqtt.py
 ```
+
+# Figuring out what signal is what
+
+Take a look at the [user manual](https://shop.hioki.eu/media/3e/5b/67/1738834447/PW3365A981-06_Manual_EN.pdf?ts=1738834447&srsltid=AfmBOoqsCC_VWRGNg6Ph-TFE5vAvN9jjEehf_WoaBhcklDH-lMw8E5rL) - section 9.4 for a description of the "Measurement Data Header" (pg 162, 169 on the pdf)
+
+
