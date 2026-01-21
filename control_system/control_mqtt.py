@@ -15,7 +15,7 @@ TOPICS = [
     ("vsd2/write", 0),
 ]
 
-ARDUINO_PORT = "/dev/ttyACM1"  # Windows: COM3, COM4, etc
+ARDUINO_PORT = "/dev/ttyUSB0"  # Windows: COM3, COM4, etc
 VALVE_PWM_PIN = 6             # D6 (PWM)
 VSD_1_PWM_PIN = 10            # D10 (PWM)
 VSD_2_PWM_PIN = 11            # D11 (PWM)           
