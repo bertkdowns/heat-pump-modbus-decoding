@@ -29,7 +29,7 @@ class MQTTAdapter:
         # Add timestamp and device_id to payload
         payload = {
             "timestamp": time.time(),  # unix timestamp
-            "device_id": str(device_id),
+            "device": str(device_id),
             "type": "modbus"
         }
         # Add register data

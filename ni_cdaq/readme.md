@@ -14,6 +14,7 @@ The download for the driver and system configuration utility just adds the apt r
 
 ```
 sudo apt update
+sudo apt upgrade
 ```
  
  (to register the packages from the new repository)
@@ -27,7 +28,15 @@ sudo apt install ni-labview-2025-community
 ```
 
 
-Once you've done all that, you might need to restart your system too - i recommend doing that.
+Once you've done all that, you might need to 
+
+```
+sudo dkms autoinstall
+sudo apt update
+sudo apt upgrade
+```
+
+restart your system too - i recommend doing that.
 
 
 YOu can then use the hardware confgiuration utility (there should be a desktop shortcut in your applications menu) to connect your defice.
