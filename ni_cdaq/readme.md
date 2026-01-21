@@ -1,6 +1,6 @@
 # Setup
 
-You need to install Ni-DAQmx for the driver support:
+You need to install Ni-DAQmx for the driver support (yes, you need to create an account, it's stupid):
 
 [https://www.ni.com/en/support/downloads/drivers/download.ni-daq-mx.html](https://www.ni.com/en/support/downloads/drivers/download.ni-daq-mx.html)
 
@@ -18,6 +18,8 @@ sudo apt upgrade
 ```
  
  (to register the packages from the new repository)
+
+You will also need to do sudo dkms autoinstall (either before or after apt install, or both to be safe.)
 
 ```
 sudo apt install ni-daqmx # I think - or maybe it's ni-software-stream-jammy or ni-software-2025-jammy 
