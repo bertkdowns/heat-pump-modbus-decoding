@@ -1,5 +1,5 @@
 .HA_VERSION
 *.log*
 .storage
-*.db
+*.db*
 *.lock
