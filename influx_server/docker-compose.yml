@@ -39,3 +39,13 @@ services:
     environment:
       INFLUX_TOKEN: supersecrettoken
     command: ["telegraf", "--config", "/etc/telegraf/telegraf.conf", "--debug"]
+
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    #privileged: true # needed if you ever want to access USB devices (we don't)
+    #network_mode: host # needed for discovery to work properly (we don't need it)
+    volumes:
+      - ./homeassistant-config:/config
+      - /etc/localtime:/etc/localtime:ro

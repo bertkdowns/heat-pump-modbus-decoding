@@ -1,0 +1,28 @@
+default_config:
+
+mqtt:
+  broker: mosquitto # mosquitto is the service name in docker-compose
+  port: 1883
+  number:
+    - name: "Valve Control"
+      unique_id: valve_control
+      command_topic: "valve/write"
+      min: 0
+      max: 1
+      step: 0.01
+      mode: slider
+      icon: mdi:valve
+
+    - name: "VSD1 Speed"
+      unique_id: vsd1_speed
+      command_topic: "vsd1/write"
+      min: 0
+      max: 1
+      step: 0.01
+
+    - name: "VSD2 Speed"
+      unique_id: vsd2_speed
+      command_topic: "vsd2/write"
+      min: 0
+      max: 1
+      step: 0.01
