@@ -2,7 +2,7 @@ import time
 import json
 import nidaqmx
 from nidaqmx.system import System
-from nidaqmx.constants import TemperatureUnits, ThermocoupleType
+from nidaqmx.constants import TemperatureUnits, ThermocoupleType, AcquisitionType
 import paho.mqtt.client as mqtt
 
 # -----------------------
@@ -54,6 +54,7 @@ def publish_mqtt_data(device_name: str, device_data: dict[str,float]):
         "device": device_name,
         "timestamp": time.time(),
     }
+    payload.update(device_data)
 
     mqtt_client.publish(
         topic,
@@ -68,6 +69,9 @@ def publish_mqtt_data(device_name: str, device_data: dict[str,float]):
 # DAQ task 
 # -----------------------
 with nidaqmx.Task() as task:
+
+
+
     all_channels = voltage_ai_channels + current_ai_channels + thermocouple_ai_channels
     for ch in voltage_ai_channels:
         task.ai_channels.add_ai_voltage_chan(ch.name)
@@ -75,6 +79,13 @@ with nidaqmx.Task() as task:
         task.ai_channels.add_ai_current_chan(ch.name)
     for ch in thermocouple_ai_channels:
         task.ai_channels.add_ai_thrmcpl_chan(ch.name, thermocouple_type=ThermocoupleType.T, units=TemperatureUnits.DEG_C)
+
+
+    task.timing.cfg_samp_clk_timing(
+        rate=1,                         # Hz
+        sample_mode=AcquisitionType.FINITE,
+        samps_per_chan=1000
+    )
 
     print("Found channels:")
     for ch in all_channels:
@@ -88,7 +99,7 @@ with nidaqmx.Task() as task:
             device_data = {}
             for ch, value in zip(all_channels, values):
                 device_data[ch.name] = float(value)
-
+            print(device_data)
             publish_mqtt_data(device_name, device_data)
 
             time.sleep(PUBLISH_INTERVAL)
