@@ -21,8 +21,9 @@ sudo apt update
 You will also need to do sudo dkms autoinstall (either before or after apt install, or both to be safe.)
 
 ```
-sudo apt install ni-daqmx # I think - or maybe it's ni-software-stream-jammy or ni-software-2025-jammy 
-sudo apt install ni-labview-2025-jammy-community # note this might be slightly different if there is a different version, use apt search or something
+sudo apt install ni-daqmx  
+sudo apt install ni-hwcfg-utility
+sudo apt install ni-labview-2025-community 
 ```
 
 
