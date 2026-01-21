@@ -1,8 +1,6 @@
 default_config:
 
 mqtt:
-  broker: mosquitto # mosquitto is the service name in docker-compose
-  port: 1883
   number:
     - name: "Valve Control"
       unique_id: valve_control
