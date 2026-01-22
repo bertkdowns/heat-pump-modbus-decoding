@@ -10,3 +10,8 @@ dependencies = [
     "pandas>=2.3.3",
     "pyserial>=3.5",
 ]
+
+[tool.uv.workspace]
+members = [
+    "control_system",
+]

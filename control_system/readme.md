@@ -5,3 +5,10 @@ valve/write
 vsd1/write
 vsd2/write
 which each should be a number input.
+
+
+you can view all serial ports with
+
+```
+ls /sys/class/tty
+```
