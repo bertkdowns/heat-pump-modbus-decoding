@@ -1,0 +1,1 @@
+arduino-cli compile --upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno ./arduino_serial_control
