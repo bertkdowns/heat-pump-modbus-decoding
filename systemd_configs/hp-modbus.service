@@ -3,6 +3,11 @@ Description=Electrical Monitoring
 After=network-online.target
 Wants=network-online.target
 
+
+# Avoid restart storms
+StartLimitIntervalSec=60
+StartLimitBurst=10
+
 [Service]
 Type=simple
 
@@ -14,15 +19,13 @@ Group=user
 WorkingDirectory=/home/user/heat-pump-modbus-decoding/modbus/
 
 # Use absolute paths
-ExecStart=/home/user/.local/bin/uv run mqtt_adapter.py
+ExecStart=/home/user/.local/bin/uv run capture.py
 
 # Restart behaviour
 Restart=always
 RestartSec=5
 
-# Avoid restart storms
-StartLimitIntervalSec=60
-StartLimitBurst=10
+
 
 # Environment (optional)
 Environment=PYTHONUNBUFFERED=1
