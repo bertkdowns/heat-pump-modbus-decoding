@@ -35,30 +35,30 @@ enum PinModeState {
 PinModeState currentMode[20];
 
 void setDigitalInput(uint8_t pin) {
-  if (currentMode != PinModeState.MODE_INPUT) {
+  if (currentMode[pin] != MODE_INPUT) {
     pinMode(pin, INPUT);
-    currentMode = MODE_INPUT;
+    currentMode[pin] = MODE_INPUT;
   }
 }
 
 void setDigitalOutput(uint8_t pin) {
-  if (currentMode != PinModeState.MODE_OUTPUT) {
+  if (currentMode[pin] != MODE_OUTPUT) {
     pinMode(pin, OUTPUT);
-    currentMode = PinModeState.MODE_OUTPUT;
+    currentMode[pin] = MODE_OUTPUT;
   }
 }
 
 void setPWMOutput(uint8_t pin) {
-  if (currentMode != PinModeState.MODE_PWM) {
+  if (currentMode[pin] != MODE_PWM) {
     pinMode(pin, OUTPUT);
-    currentMode = PinModeState.MODE_PWM;
+    currentMode[pin] = MODE_PWM;
   }
 }
 
 void setup() {
   Serial.begin(BAUDRATE);
   for(int i = 0; i < NUM_PINS; i++){
-    currentMode[i] = PinModeState.MODE_UNKNOWN
+    currentMode[i] = MODE_UNKNOWN;
   }
 }
 
@@ -71,7 +71,7 @@ void loop() {
   }
   // avoid buffer overflows
   if (index >= 4) {
-    index = 0
+    index = 0;
   }
 
   while (Serial.available()) {
@@ -126,15 +126,15 @@ void handleCommand(uint8_t cmd,uint8_t pin, uint8_t value) {
 
     case CMD_DIGITAL_WRITE: {
       setDigitalOutput(pin);
-      digitalWrite(PIN, value ? HIGH : LOW);
-      Serial.write(0)
+      digitalWrite(pin, value ? HIGH : LOW);
+      Serial.write(0);
       break;
     }
 
     case CMD_ANALOG_WRITE: {
       setPWMOutput(pin);
-      analogWrite(PIN, value);
-      Serial.write(0)
+      analogWrite(pin, value);
+      Serial.write(0);
       break;
     }
   }

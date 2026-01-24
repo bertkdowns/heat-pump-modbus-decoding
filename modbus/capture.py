@@ -2,11 +2,11 @@ import serial
 import time
 import pandas as pd
 from parse_csv import PacketParser, PacketParseError
-from rs485_mqtt import MQTTAdapter
+from mqtt_adapter import MQTTAdapter
 # -----------------------------
 # Configuration
 # -----------------------------
-SERIAL_PORT = "/dev/ttyACM0"   # Change as needed
+SERIAL_PORT = "/dev/serial/by-id/usb-DFRobot_www.dfrobot.com__0043_34330313431351700141-if00"   # /dev/ttyACM0, Change as needed
 BAUDRATE = 4800               # Modbus RTU baud
 MESSAGE_GAP_TIMEOUT = 0.005   # 5 ms
 MAX_BUFFER_SIZE = 700

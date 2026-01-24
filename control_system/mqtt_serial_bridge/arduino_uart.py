@@ -20,7 +20,7 @@ CMD_DIGITAL_WRITE = 0x03
 CMD_ANALOG_WRITE  = 0x04
 
 class ArduinoUART:
-    def __init__(self, port, baudrate=115200, timeout=0.1):
+    def __init__(self, port, baudrate=9600, timeout=0.1):
         self.ser = serial.Serial(port, baudrate, timeout=timeout)
         time.sleep(2)  # Arduino reset
 

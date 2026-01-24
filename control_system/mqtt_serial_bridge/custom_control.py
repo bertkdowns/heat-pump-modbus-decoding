@@ -1,6 +1,6 @@
+from arduino_uart import ArduinoUART
 import time
 import sys
-from pyfirmata import Arduino, util
 import paho.mqtt.client as mqtt
 
 # -------------------------
@@ -15,27 +15,13 @@ TOPICS = [
     ("vsd2/write", 0),
 ]
 
-ARDUINO_PORT = "/dev/ttyUSB0"  # Windows: COM3, COM4, etc
+ARDUINO_PORT = "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0" # Should normally be ttyUSB0  # Windows: COM3, COM4, etc
 VALVE_PWM_PIN = 6             # D6 (PWM)
 VSD_1_PWM_PIN = 10            # D10 (PWM)
 VSD_2_PWM_PIN = 11            # D11 (PWM)           
-# -------------------------
-# Arduino Setup
-# -------------------------
-print("Connecting to Arduino...")
-board = Arduino(ARDUINO_PORT)
 
-# Required for stable Firmata operation
-it = util.Iterator(board)
-it.start()
 
-valve_pin = board.get_pin(f"d:{VALVE_PWM_PIN}:p")
-valve_pin.write(1.0) # initialise to open
-vsd1_pin = board.get_pin(f"d:{VSD_1_PWM_PIN}:p")
-vsd2_pin = board.get_pin(f"d:{VSD_2_PWM_PIN}:p")
-vsd1_pin.write(0.0) # initialise to off
-vsd2_pin.write(0.0) # initialise to off
-
+arduino = ArduinoUART(ARDUINO_PORT,baudrate=9600)
 # -------------------------
 # MQTT Callbacks
 # -------------------------
@@ -64,17 +50,16 @@ def on_message(client, userdata, msg):
         return
 
     if topic == "valve/write":
-        valve_pin.write(value)
+        arduino.analog_write(VALVE_PWM_PIN, value)
         print(f"Valve PWM set to {value:.2f}")
 
     elif topic == "vsd1/write":
         print(f"VSD1 received {value}")
-        vsd1_pin.write(value)
+        arduino.analog_write(VSD_1_PWM_PIN, value)
 
     elif topic == "vsd2/write":
         print(f"VSD2 received {value}")
-        vsd2_pin.write(value)
-
+        arduino.analog_write(VSD_2_PWM_PIN, value)
 # -------------------------
 # MQTT Client
 # -------------------------
@@ -94,6 +79,5 @@ except KeyboardInterrupt:
     print("\nShutting down...")
 
 finally:
-    valve_pin.write(0.0)
-    board.exit()
+    arduino.analog_write(VALVE_PWM_PIN,1.0)
     sys.exit(0)

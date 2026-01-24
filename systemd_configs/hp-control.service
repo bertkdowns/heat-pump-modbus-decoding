@@ -1,0 +1,31 @@
+[Unit]
+Description=Electrical Monitoring
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# Run as non-root (user is literally my username :)
+User=user
+Group=user
+
+# Always set this
+WorkingDirectory=/home/user/heat-pump-modbus-decoding/control_system/mqtt_serial_bridge/
+
+# Use absolute paths
+ExecStart=/home/user/.local/bin/uv run custom_control.py
+
+# Restart behaviour
+Restart=always
+RestartSec=5
+
+# Avoid restart storms
+StartLimitIntervalSec=60
+StartLimitBurst=10
+
+# Environment (optional)
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
