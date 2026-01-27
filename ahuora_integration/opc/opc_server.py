@@ -1,3 +1,10 @@
+# A MQTT to OPC adapter, which listens to all mqtt events and
+# creates a node for each different topic. if the topic has 
+# a JSON payload it creates sub-nodes for each of the keys in the 
+# topic, with the key as the name of the sub-node and the value 
+# as the value. If the topic payload is just a float it doesn't 
+# create any sub-nodes.
+
 import json
 import threading
 from typing import Dict
