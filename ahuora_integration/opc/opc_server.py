@@ -41,6 +41,11 @@ class MqttToOpcAdapter:
         self.server.start()
         print(f"OPC UA server started at {OPC_ENDPOINT}")
 
+        # Create a node for outputs
+        self.outputs_node = self.objects.add_object(self.idx, "Solver outputs")
+        # create a variable on the outputs node
+        self.outputs_node.add_variable(self.idx, "test", 0).set_writable()
+
     def stop_opc(self):
         self.server.stop()
 
