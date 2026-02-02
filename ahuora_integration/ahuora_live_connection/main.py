@@ -100,10 +100,11 @@ class MQTTSolverBridge:
                 continue
 
             results = self.solver.solve(self.latest_values)
-            print(f"Publishing tags to MQTT with prefix {self.publish_prefix}")
-            for tag, value in results.values.items():
-                topic = f"{self.publish_prefix}{tag}"
-                self.client.publish(topic, value)
+            if results.ok:
+                print(f"Publishing tags to MQTT with prefix {self.publish_prefix}")
+                for tag, value in results.values.items():
+                    topic = f"{self.publish_prefix}{tag}"
+                    self.client.publish(topic, value)
 
     # -------------------------
     # Run
@@ -118,22 +119,19 @@ class MQTTSolverBridge:
 # -----------------------------
 if __name__ == "__main__":
     TOPIC_TAG_MAP = {
-        "valve/write": "ValvePosition",
-        "modbus/device/0/registers": {
-            "2027": "TemperatureTag"
-        }
+        #"valve/write": "ValvePosition",
+        "processed/air_ambient": "Air_ambient",
+        "processed/air_ambient2": "Air_ambient_2",
+        #"processed/inlet_temp":"Temperature_HP_in",
+        "processed/outlet_temp":"Temperature_HP_out",
+        "processed/pressure_low": "pressure_low",
+        # This format also works:
+        # "modbus/device/0/registers": {
+        #     "2026": "AirAmbient"
+        # }
     }
 
-    scenario_tag_map : ScenarioTagMap = {
-    "ValvePosition": PropertyTagMap(
-        property= PropertyValueId(338165),
-        units= "mol/s"
-    ),
-    "TemperatureTag": PropertyTagMap(
-        property= PropertyValueId(338263),
-        units="mol/s"
-    )
-}
+    scenario_tag_map : ScenarioTagMap = json.loads(Path("./tag_mappings.json").read_text())
 
     bridge = MQTTSolverBridge(
         broker="localhost",
