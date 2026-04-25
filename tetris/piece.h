@@ -5,12 +5,15 @@ class TetrisPiece{
     int x;
     int y;
     bool piece[4][4] = {false};
+
     void show(){
       show(true);
     }
+
     void hide(){
       show(false);
     }
+
     void show(bool visible){
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -20,6 +23,7 @@ class TetrisPiece{
         }
       }
     } 
+
     void rotate(){
       // Implement rotation logic here
       bool temp[4][4] = {false};
@@ -30,9 +34,11 @@ class TetrisPiece{
       }
       memcpy(piece, temp, sizeof(piece));
     }
+
     bool is_colliding(){
       return is_colliding(x, y);
     }
+
     bool is_colliding(int x, int y){
       // Implement collision detection logic here
       for (int i = 0; i < 4; i++) {
@@ -44,7 +50,35 @@ class TetrisPiece{
       }
       return false;
     }
+
     void switchPiece(int new_type){
       memcpy(piece, tetronimos[new_type], sizeof(piece));
+    }
+
+    void tryRotate(){
+      hide();
+      rotate();
+      if (is_colliding(x, y)) {
+        // If it collides, rotate back
+        rotate();
+        rotate();
+        rotate();
+      }
+    }
+
+    void moveLeft(){
+      hide();
+      if (!is_colliding(x - 1, y)) {
+        x--;
+      }
+      show();
+    }
+    
+    void moveRight(){
+      hide();
+      if (!is_colliding(x + 1, y)) {
+        x++;
+      }
+      show();
     }
 };

@@ -7,7 +7,11 @@
 #define SIN3 6
 #define LATCH 7
 
-
+#define BTN_LEFT 8
+#define BTN_RIGHT 9
+#define BTN_ROTATE_LEFT 10
+#define BTN_ROTATE_RIGHT 11
+#define BTN_DEBOUNCE_TIME 100
 
 int update_time = 100;
 int prev_time = 0;
@@ -21,9 +25,31 @@ int current_time = 0;
 #define S 5
 #define Z 6
 
+int time_since[4] = { 0, 0, 0, 0 };
 
 
 TetrisPiece current_piece = TetrisPiece();
+
+void handle_buttons(){
+  current_time = millis();
+  if (digitalRead(BTN_LEFT) == LOW && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
+    time_since[0] = current_time;
+    current_piece.moveLeft();
+  }
+  if (digitalRead(BTN_RIGHT) == LOW && current_time - time_since[1] > BTN_DEBOUNCE_TIME) {
+    time_since[1] = current_time;
+    current_piece.moveRight();
+  }
+  if (digitalRead(BTN_ROTATE_LEFT) == LOW && current_time - time_since[2] > BTN_DEBOUNCE_TIME) {
+    time_since[2] = current_time;
+    current_piece.tryRotate();
+  }
+  if (digitalRead(BTN_ROTATE_RIGHT) == LOW && current_time - time_since[3] > BTN_DEBOUNCE_TIME) {
+    time_since[3] = current_time;
+    current_piece.tryRotate();
+  }
+}
+
 
 
 void setup() {
@@ -33,6 +59,10 @@ void setup() {
   pinMode(SIN3, OUTPUT);
   pinMode(LATCH,OUTPUT);
   digitalWrite(LATCH,HIGH);
+  pinMode(BTN_LEFT, INPUT_PULLUP);
+  pinMode(BTN_RIGHT, INPUT_PULLUP);
+  pinMode(BTN_ROTATE_LEFT, INPUT_PULLUP);
+  pinMode(BTN_ROTATE_RIGHT, INPUT_PULLUP);
   current_piece.x = 5;
   current_piece.y = 8;
 
@@ -45,6 +75,7 @@ void loop() {
     update_game();
     prev_time = current_time;
   }
+  handle_buttons();
   
   update_display();
 }
