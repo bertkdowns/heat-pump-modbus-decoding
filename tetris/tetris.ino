@@ -1,32 +1,74 @@
+// #include <array>
+#include "piece.h"
+#include "shuffle.h"
 #define CLK 3
 #define SIN1 4
 #define SIN2 5
 #define SIN3 6
 #define LATCH 7
 
-bool display_data[16][32] = {false}; // x;y or col;row
+
+
+int update_time = 100;
+int prev_time = 0;
+int current_time = 0;
+
+#define T 0
+#define I 1
+#define O 2
+#define L 3
+#define J 4
+#define S 5
+#define Z 6
+
+
+
+TetrisPiece current_piece = TetrisPiece();
 
 
 void setup() {
-  Serial.begin(4800);   // make sure this matches the sender
   pinMode(CLK, OUTPUT);
   pinMode(SIN1, OUTPUT);
   pinMode(SIN2, OUTPUT);
   pinMode(SIN3, OUTPUT);
   pinMode(LATCH,OUTPUT);
   digitalWrite(LATCH,HIGH);
-  display_data[0][0] = true;
-  display_data[4][1] = true;
-  display_data[8][2] = true;
-  display_data[12][24] = true;
+  current_piece.x = 5;
+  current_piece.y = 8;
+
+  current_piece.switchPiece(T);
 }
 
 void loop() {
+  int current_time = millis();
+  if (current_time - prev_time >= update_time) {
+    update_game();
+    prev_time = current_time;
+  }
   
   update_display();
 }
 
+void update_game() {
+  current_piece.hide(); // hide so it doesn't collide with itself
+  if(current_piece.is_colliding(current_piece.x, current_piece.y + 1)){
+    // We leave the piece there and don't get rid of it.
+    // Start with a new piece.
+    current_piece.show();
+    current_piece.switchPiece(chooseRandomPiece());
+    current_piece.y = 0;
+  }
+ current_piece.y = current_piece.y + 1;
+ current_piece.show();
+}
 
+void clear_display() {
+  for (int x = 0; x < 16; x++) {
+    for (int y = 0; y < 32; y++) {
+      display_data[x][y] = false;
+    }
+  }
+}
 
 // Shifts values to display_data and latches
 void update_display() {
@@ -56,6 +98,11 @@ void update_display() {
   }
 }
 
+
+
+
+
+
 // Teris grid:
 /*
 XXXXXXXXXXXXXXXX
@@ -67,6 +114,7 @@ XXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXX
+
 XXXXXXXXXXXXXXXX
 XXX          XXX
 XXX          XXX
