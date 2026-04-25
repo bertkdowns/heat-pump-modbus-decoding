@@ -13,7 +13,7 @@
 #define BTN_ROTATE_RIGHT 11
 #define BTN_DEBOUNCE_TIME 100
 
-int update_time = 100;
+int update_time = 300;
 int prev_time = 0;
 int current_time = 0;
 
@@ -40,13 +40,13 @@ void handle_buttons(){
     time_since[1] = current_time;
     current_piece.moveRight();
   }
-  if (digitalRead(BTN_ROTATE_LEFT) == LOW && current_time - time_since[2] > BTN_DEBOUNCE_TIME) {
+  if (digitalRead(BTN_ROTATE_LEFT) == LOW && current_time - time_since[2] > BTN_DEBOUNCE_TIME * 3) {
     time_since[2] = current_time;
     current_piece.tryRotate();
   }
   if (digitalRead(BTN_ROTATE_RIGHT) == LOW && current_time - time_since[3] > BTN_DEBOUNCE_TIME) {
     time_since[3] = current_time;
-    current_piece.tryRotate();
+    update_game();
   }
 }
 
@@ -86,8 +86,10 @@ void update_game() {
     // We leave the piece there and don't get rid of it.
     // Start with a new piece.
     current_piece.show();
+    clear_rows();
     current_piece.switchPiece(chooseRandomPiece());
     current_piece.y = 0;
+    current_piece.x = 7;
   }
  current_piece.y = current_piece.y + 1;
  current_piece.show();
@@ -130,9 +132,32 @@ void update_display() {
 }
 
 
+void clear_rows() {
+  for (int y = 0; y < 32; y++) {
+    bool full_row = true;
+    for (int x = 0; x < 16; x++) {
+      if (!display_data[x][y]) {
+        full_row = false;
+        break;
+      }
+    }
+    if (full_row) {
+      // Clear the row
+      for (int x = 0; x < 16; x++) {
+        display_data[x][y] = false;
+      }
+      shift_rows_down(y);
+    }
+  }
+}
 
-
-
+void shift_rows_down(int cleared_row) {
+  for (int y = cleared_row; y > 0; y--) {
+    for (int x = 0; x < 16; x++) {
+      display_data[x][y] = display_data[x][y - 1];
+    }
+  }
+}
 
 // Teris grid:
 /*
