@@ -1,0 +1,11 @@
+title: Control Panel
+views:
+  - title: Actuators
+    path: actuators
+    cards:
+      - type: entities
+        title: Arduino Controls
+        entities:
+          - number.valve_control
+          - number.vsd1_speed
+          - number.vsd2_speed

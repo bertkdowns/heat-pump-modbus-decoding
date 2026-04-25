@@ -1,0 +1,16 @@
+[project]
+name = "power-meter-mqtt-bridge"
+version = "0.1.0"
+description = "TCP power meter to MQTT bridge"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+authors = [
+  { name = "Bert Downs" }
+]
+
+dependencies = [
+  "paho-mqtt>=1.6"
+]
+

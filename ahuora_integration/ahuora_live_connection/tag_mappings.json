@@ -1,0 +1,23 @@
+{
+    "Air_ambient": {
+        "property": 338166,
+        "units": "degC"
+    },
+    "Air_ambient_2": {
+        "property": 338231,
+        "units": "degC"
+    },
+
+    "pressure_low": {
+        "property": 338125,
+        "units": "psi"
+    },
+    "Temperature_HP_out": {
+        "property": 338079,
+        "units": "degC"
+    },
+    "Temperature_HP_in": {
+        "property": 338264,
+        "units": "degC"
+    }
+}
