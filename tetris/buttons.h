@@ -1,6 +1,6 @@
 #include "pinout.h"
 
-#define BTN_DEBOUNCE_TIME 70
+#define BTN_DEBOUNCE_TIME 100
 
 
 bool button_state[8] = {false};

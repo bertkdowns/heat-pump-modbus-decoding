@@ -2,7 +2,6 @@
 #include "shuffle.h"
 #include "display.h"
 #include "buttons.h"
-#include "scorecounter.h"
 
 int prev_time = 0;
 int current_time = 0;
@@ -98,11 +97,11 @@ void updateGame() {
     current_piece.show();
     clearRows();
     getNewPiece();
+    updateScoreCounter(1);
     current_piece.y = 0;
     current_piece.x = 7;
   }
  current_piece.y = current_piece.y + 1;
  current_piece.show();
- updateScoreCounter(1);
 }
 

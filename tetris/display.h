@@ -1,5 +1,7 @@
 #include "piece.h"
 #include "pinout.h"
+#include "scorecounter.h"
+
 
 #define TETRIS_BOARD_X_START 1
 #define TETRIS_BOARD_WIDTH 10
@@ -62,6 +64,7 @@ void clearRows() {
       }
     }
     if (full_row) {
+      updateScoreCounter(10);
       // Clear the row
       for (int x = TETRIS_BOARD_X_START; x < TETRIS_BOARD_X_START + TETRIS_BOARD_WIDTH; x++) {
         display_data[x][y] = false;
