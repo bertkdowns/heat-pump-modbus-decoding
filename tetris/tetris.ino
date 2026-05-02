@@ -32,7 +32,7 @@ int time_since[4] = { 0, 0, 0, 0 };
 TetrisPiece current_piece = TetrisPiece();
 TetrisPiece hold_piece = TetrisPiece();
 // store the hold piece number
-void handle_buttons(){
+void handleButtons(){
   current_time = millis();
   if (digitalRead(BTN_LEFT) == LOW && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
     time_since[0] = current_time;
@@ -48,13 +48,14 @@ void handle_buttons(){
   }
   if (digitalRead(BTN_ROTATE_RIGHT) == LOW && current_time - time_since[3] > BTN_DEBOUNCE_TIME) {
     time_since[3] = current_time;
-    update_game();
+    updateGame();
   }
 }
 
 
 
 void setup() {
+  setupButtons();
   pinMode(CLK, OUTPUT);
   pinMode(SIN1, OUTPUT);
   pinMode(SIN2, OUTPUT);
@@ -77,27 +78,27 @@ void setup() {
 void loop() {
   int current_time = millis();
   if (current_time - prev_time >= update_time) {
-    update_game();
+    updateGame();
     prev_time = current_time;
   }
-  handle_buttons();
+  handleButtons();
   
-  update_display();
+  updateDisplay();
 }
 
-void switch_held_piece(){
+void switchHeldPiece(){
   TetrisPiece tmp = current_piece;
 }
 
-void update_game() {
-  get_button_state();
-  print_button_state();
+void updateGame() {
+  getButtonState();
+  printButtonState();
   current_piece.hide(); // hide so it doesn't collide with itself
-  if(current_piece.is_colliding(current_piece.x, current_piece.y + 1)){
+  if(current_piece.isColliding(current_piece.x, current_piece.y + 1)){
     // We leave the piece there and don't get rid of it.
     // Start with a new piece.
     current_piece.show();
-    clear_rows();
+    clearRows();
     current_piece.switchPiece(chooseRandomPiece());
     current_piece.y = 0;
     current_piece.x = 7;
@@ -106,7 +107,7 @@ void update_game() {
  current_piece.show();
 }
 
-void clear_display() {
+void clearDisplay() {
   for (int x = 0; x < 16; x++) {
     for (int y = 0; y < 32; y++) {
       display_data[x][y] = false;
@@ -115,7 +116,7 @@ void clear_display() {
 }
 
 // Shifts values to display_data and latches
-void update_display() {
+void updateDisplay() {
   // SIN1 controls the columns (x)
   // SIN2 controls the top rows (y)
   // SIN3 controls the bottom rows;
@@ -143,7 +144,7 @@ void update_display() {
 }
 
 
-void clear_rows() {
+void clearRows() {
   for (int y = 0; y < 32; y++) {
     bool full_row = true;
     for (int x = 0; x < 16; x++) {
@@ -158,50 +159,15 @@ void clear_rows() {
         display_data[x][y] = false;
       }
       update_time = update_time * 0.9;
-      shift_rows_down(y);
+      shiftRowsDown(y);
     }
   }
 }
 
-void shift_rows_down(int cleared_row) {
+void shiftRowsDown(int cleared_row) {
   for (int y = cleared_row; y > 0; y--) {
     for (int x = 0; x < 16; x++) {
       display_data[x][y] = display_data[x][y - 1];
     }
   }
 }
-
-// Teris grid:
-/*
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXX
-
-XXXXXXXXXXXXXXXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-XXX          XXX
-*/

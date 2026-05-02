@@ -35,11 +35,11 @@ class TetrisPiece{
       memcpy(piece, temp, sizeof(piece));
     }
 
-    bool is_colliding(){
-      return is_colliding(x, y);
+    bool isColliding(){
+      return isColliding(x, y);
     }
 
-    bool is_colliding(int x, int y){
+    bool isColliding(int x, int y){
       // Implement collision detection logic here
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -58,7 +58,7 @@ class TetrisPiece{
     void tryRotate(){
       hide();
       rotate();
-      if (is_colliding(x, y)) {
+      if (isColliding(x, y)) {
         // If it collides, rotate back
         rotate();
         rotate();
@@ -68,7 +68,7 @@ class TetrisPiece{
 
     void moveLeft(){
       hide();
-      if (!is_colliding(x - 1, y)) {
+      if (!isColliding(x - 1, y)) {
         x--;
       }
       show();
@@ -76,7 +76,7 @@ class TetrisPiece{
     
     void moveRight(){
       hide();
-      if (!is_colliding(x + 1, y)) {
+      if (!isColliding(x + 1, y)) {
         x++;
       }
       show();
