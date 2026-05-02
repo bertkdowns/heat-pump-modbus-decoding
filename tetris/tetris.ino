@@ -17,6 +17,7 @@ TetrisPiece next_piece = TetrisPiece();
 void handleButtons(){
   current_time = millis();
   getButtonState();
+  printButtonState();
   if (button_state[BTN_LEFT_IDX] == LOW && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
     time_since[0] = current_time;
     current_piece.moveLeft();
