@@ -1,6 +1,4 @@
-#define BUTTON_CLK 8
-#define BUTTON_DATA 9
-#define BUTTON_IN 10
+#include "pinout.h"
 
 bool button_state[8] = {false};
 

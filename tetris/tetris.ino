@@ -1,23 +1,12 @@
 // #include <array>
-#include "piece.h"
 #include "shuffle.h"
 #include "buttons.h"
-#define SIN1 2
-#define SIN2 3
-#define SIN3 4
-#define CLK 5 // note: changed clock pin
-#define LATCH 6
+#include "display.h"
 
-#define BTN_LEFT 8
-#define BTN_RIGHT 9
-#define BTN_ROTATE_LEFT 10
-#define BTN_ROTATE_RIGHT 11
-#define BTN_DEBOUNCE_TIME 70
-
-int update_time = 300;
 int prev_time = 0;
 int current_time = 0;
 
+// Tetris pieces
 #define T 0
 #define I 1
 #define O 2
@@ -107,67 +96,3 @@ void updateGame() {
  current_piece.show();
 }
 
-void clearDisplay() {
-  for (int x = 0; x < 16; x++) {
-    for (int y = 0; y < 32; y++) {
-      display_data[x][y] = false;
-    }
-  }
-}
-
-// Shifts values to display_data and latches
-void updateDisplay() {
-  // SIN1 controls the columns (x)
-  // SIN2 controls the top rows (y)
-  // SIN3 controls the bottom rows;
-  // We have to print one row at a time becuase it's a dot matrix display_data
-  
-  for (int col_to_show = 0; col_to_show < 16; col_to_show++) {
-    digitalWrite(LATCH, LOW);
-    for(int row_n = 0; row_n < 16; row_n ++){
-      if (row_n == col_to_show){
-        // enable this row
-        digitalWrite(SIN1, HIGH);
-      } else {
-        digitalWrite(SIN1, LOW);
-      }
-      digitalWrite(SIN3, display_data[col_to_show][row_n]); // Write the appropriate data for this column
-      digitalWrite(SIN2, display_data[col_to_show][row_n+16]); // Write the appropriate data for this column
-      // pulse the clock
-      digitalWrite(CLK, HIGH);
-      // cpu delay is long enough
-      digitalWrite(CLK, LOW);
-    }
-    digitalWrite(LATCH, HIGH);
-    delayMicroseconds(10);
-  }
-}
-
-
-void clearRows() {
-  for (int y = 0; y < 32; y++) {
-    bool full_row = true;
-    for (int x = 0; x < 16; x++) {
-      if (!display_data[x][y]) {
-        full_row = false;
-        break;
-      }
-    }
-    if (full_row) {
-      // Clear the row
-      for (int x = 0; x < 16; x++) {
-        display_data[x][y] = false;
-      }
-      update_time = update_time * 0.9;
-      shiftRowsDown(y);
-    }
-  }
-}
-
-void shiftRowsDown(int cleared_row) {
-  for (int y = cleared_row; y > 0; y--) {
-    for (int x = 0; x < 16; x++) {
-      display_data[x][y] = display_data[x][y - 1];
-    }
-  }
-}
