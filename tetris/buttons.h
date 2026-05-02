@@ -38,8 +38,8 @@ void getButtonState(){
 }
 
 // Button debugging logic: uses a small part of the display to tell us what buttons are being pressed.
-#define BUTTONX 15
-#define BUTTONY 12
+#define BUTTONX 13
+#define BUTTONY 14
 
 void printButtonState(){
     for(int i = 0; i < 8; i++){
