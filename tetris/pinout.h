@@ -16,7 +16,7 @@
 
 // Which index on the shift register the button is
 // so you can use button_state[BTN_LEFT_IDX] to get the state of that button.
-#define BTN_LEFT_IDX 4
-#define BTN_RIGHT_IDX 5
-#define BTN_ROTATE_LEFT_IDX 6
-#define BTN_ROTATE_RIGHT_IDX 7
+#define BTN_LEFT_IDX 3
+#define BTN_RIGHT_IDX 2
+#define BTN_ROTATE_LEFT_IDX 1
+#define BTN_SPEED_DOWN_IDX 4

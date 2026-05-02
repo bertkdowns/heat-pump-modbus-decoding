@@ -26,7 +26,8 @@ void getButtonState(){
 
     for(int i = 0; i < 8; i++){
         digitalWrite(BUTTON_CLK,HIGH);
-        button_state[i] = digitalRead(BUTTON_IN);
+        bool data = digitalRead(BUTTON_IN);
+        button_state[i] = data;
         digitalWrite(BUTTON_CLK,LOW);
     };
     digitalWrite(BUTTON_CLK,HIGH);

@@ -18,19 +18,19 @@ void handleButtons(){
   current_time = millis();
   getButtonState();
   printButtonState();
-  if (button_state[BTN_LEFT_IDX] == LOW && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
+  if (button_state[BTN_LEFT_IDX] && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
     time_since[0] = current_time;
     current_piece.moveLeft();
   }
-  if (button_state[BTN_RIGHT_IDX] == LOW && current_time - time_since[1] > BTN_DEBOUNCE_TIME) {
+  if (button_state[BTN_RIGHT_IDX] && current_time - time_since[1] > BTN_DEBOUNCE_TIME) {
     time_since[1] = current_time;
     current_piece.moveRight();
   }
-  if (button_state[BTN_ROTATE_LEFT_IDX] == LOW && current_time - time_since[2] > BTN_DEBOUNCE_TIME * 3) {
+  if (button_state[BTN_ROTATE_LEFT_IDX] && current_time - time_since[2] > BTN_DEBOUNCE_TIME * 3) {
     time_since[2] = current_time;
     current_piece.tryRotate();
   }
-  if (button_state[BTN_ROTATE_RIGHT_IDX] == LOW && current_time - time_since[3] > BTN_DEBOUNCE_TIME) {
+  if (button_state[BTN_SPEED_DOWN_IDX] && current_time - time_since[3] > BTN_DEBOUNCE_TIME) {
     time_since[3] = current_time;
     updateGame();
   }
