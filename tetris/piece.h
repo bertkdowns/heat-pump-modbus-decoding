@@ -5,6 +5,7 @@ class TetrisPiece{
     int x;
     int y;
     bool piece[4][4] = {false};
+    int type = T;
 
     void show(){
       show(true);
@@ -52,6 +53,7 @@ class TetrisPiece{
     }
 
     void switchPiece(int new_type){
+      type = new_type;
       memcpy(piece, tetronimos[new_type], sizeof(piece));
     }
 

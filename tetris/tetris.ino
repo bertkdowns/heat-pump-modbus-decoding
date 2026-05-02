@@ -1,26 +1,19 @@
 // #include <array>
 #include "shuffle.h"
-#include "buttons.h"
 #include "display.h"
+#include "buttons.h"
+#include "scorecounter.h"
 
 int prev_time = 0;
 int current_time = 0;
-
-// Tetris pieces
-#define T 0
-#define I 1
-#define O 2
-#define L 3
-#define J 4
-#define S 5
-#define Z 6
 
 int time_since[4] = { 0, 0, 0, 0 };
 
 
 TetrisPiece current_piece = TetrisPiece();
 TetrisPiece hold_piece = TetrisPiece();
-// store the hold piece number
+TetrisPiece next_piece = TetrisPiece();
+
 void handleButtons(){
   current_time = millis();
   getButtonState();
@@ -52,17 +45,18 @@ void setup() {
   pinMode(SIN3, OUTPUT);
   pinMode(LATCH,OUTPUT);
   digitalWrite(LATCH,HIGH);
-  pinMode(BTN_LEFT, INPUT_PULLUP);
-  pinMode(BTN_RIGHT, INPUT_PULLUP);
-  pinMode(BTN_ROTATE_LEFT, INPUT_PULLUP);
-  pinMode(BTN_ROTATE_RIGHT, INPUT_PULLUP);
   current_piece.x = 5;
   current_piece.y = 8;
 
   current_piece.switchPiece(T);
-  hold_piece.x = 0;
-  hold_piece.y = 0;
+  hold_piece.x = 11;
+  hold_piece.y = 6;
+  hold_piece.switchPiece(T);
   hold_piece.hide();
+  next_piece.switchPiece(chooseRandomPiece());
+  next_piece.x = 11;
+  next_piece.y = 1;
+  next_piece.hide(); // display sillhouette
 }
 
 void loop() {
@@ -77,7 +71,21 @@ void loop() {
 }
 
 void switchHeldPiece(){
-  TetrisPiece tmp = current_piece;
+  hold_piece.show();
+  current_piece.hide();
+  int tmp = hold_piece.type;
+  hold_piece.switchPiece(current_piece.type);
+  current_piece.switchPiece(tmp);
+  hold_piece.hide(); // displays the sillhouette
+  current_piece.show(); // displays the new current piece
+}
+
+void getNewPiece(){
+  current_piece.switchPiece(next_piece.type);
+  // update the display of the next piece
+  next_piece.show();
+  next_piece.switchPiece(chooseRandomPiece());
+  next_piece.hide(); // displays the sillhouette  
 }
 
 void updateGame() {
@@ -88,11 +96,12 @@ void updateGame() {
     // Start with a new piece.
     current_piece.show();
     clearRows();
-    current_piece.switchPiece(chooseRandomPiece());
+    getNewPiece();
     current_piece.y = 0;
     current_piece.x = 7;
   }
  current_piece.y = current_piece.y + 1;
  current_piece.show();
+ updateScoreCounter(1);
 }
 

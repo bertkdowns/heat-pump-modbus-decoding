@@ -1,6 +1,9 @@
 #include "piece.h"
 #include "pinout.h"
 
+#define TETRIS_BOARD_X_START 1
+#define TETRIS_BOARD_WIDTH 10
+
 int update_time = 300;
 
 void clearDisplay() {
@@ -42,7 +45,7 @@ void updateDisplay() {
 
 void shiftRowsDown(int cleared_row) {
   for (int y = cleared_row; y > 0; y--) {
-    for (int x = 0; x < 16; x++) {
+    for (int x = TETRIS_BOARD_X_START; x < TETRIS_BOARD_X_START + TETRIS_BOARD_WIDTH; x++) {
       display_data[x][y] = display_data[x][y - 1];
     }
   }
@@ -52,7 +55,7 @@ void shiftRowsDown(int cleared_row) {
 void clearRows() {
   for (int y = 0; y < 32; y++) {
     bool full_row = true;
-    for (int x = 0; x < 16; x++) {
+    for (int x = TETRIS_BOARD_X_START; x < TETRIS_BOARD_X_START + TETRIS_BOARD_WIDTH; x++) {
       if (!display_data[x][y]) {
         full_row = false;
         break;
@@ -60,7 +63,7 @@ void clearRows() {
     }
     if (full_row) {
       // Clear the row
-      for (int x = 0; x < 16; x++) {
+      for (int x = TETRIS_BOARD_X_START; x < TETRIS_BOARD_X_START + TETRIS_BOARD_WIDTH; x++) {
         display_data[x][y] = false;
       }
       update_time = update_time * 0.9;

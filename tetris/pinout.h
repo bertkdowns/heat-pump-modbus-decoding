@@ -1,3 +1,5 @@
+// This file defines which arduino pins are used for what.
+
 
 // DOT MATRIX DISPLAY
 #define SIN1 2
