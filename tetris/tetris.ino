@@ -81,7 +81,7 @@ void switchHeldPiece(){
 
 void updateGame() {
   getButtonState();
-  printButtonState();
+  //printButtonState();
   current_piece.hide(); // hide so it doesn't collide with itself
   if(current_piece.isColliding(current_piece.x, current_piece.y + 1)){
     // We leave the piece there and don't get rid of it.
