@@ -23,19 +23,20 @@ TetrisPiece hold_piece = TetrisPiece();
 // store the hold piece number
 void handleButtons(){
   current_time = millis();
-  if (digitalRead(BTN_LEFT) == LOW && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
+  getButtonState();
+  if (button_state[BTN_LEFT_IDX] == LOW && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
     time_since[0] = current_time;
     current_piece.moveLeft();
   }
-  if (digitalRead(BTN_RIGHT) == LOW && current_time - time_since[1] > BTN_DEBOUNCE_TIME) {
+  if (button_state[BTN_RIGHT_IDX] == LOW && current_time - time_since[1] > BTN_DEBOUNCE_TIME) {
     time_since[1] = current_time;
     current_piece.moveRight();
   }
-  if (digitalRead(BTN_ROTATE_LEFT) == LOW && current_time - time_since[2] > BTN_DEBOUNCE_TIME * 3) {
+  if (button_state[BTN_ROTATE_LEFT_IDX] == LOW && current_time - time_since[2] > BTN_DEBOUNCE_TIME * 3) {
     time_since[2] = current_time;
     current_piece.tryRotate();
   }
-  if (digitalRead(BTN_ROTATE_RIGHT) == LOW && current_time - time_since[3] > BTN_DEBOUNCE_TIME) {
+  if (button_state[BTN_ROTATE_RIGHT_IDX] == LOW && current_time - time_since[3] > BTN_DEBOUNCE_TIME) {
     time_since[3] = current_time;
     updateGame();
   }
@@ -80,7 +81,6 @@ void switchHeldPiece(){
 }
 
 void updateGame() {
-  getButtonState();
   //printButtonState();
   current_piece.hide(); // hide so it doesn't collide with itself
   if(current_piece.isColliding(current_piece.x, current_piece.y + 1)){

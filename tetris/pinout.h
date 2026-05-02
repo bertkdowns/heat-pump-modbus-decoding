@@ -10,9 +10,11 @@
 #define BUTTON_CLK 8
 #define BUTTON_DATA 9
 #define BUTTON_IN 10
-// old button pinout - deprecated
-#define BTN_LEFT 8
-#define BTN_RIGHT 9
-#define BTN_ROTATE_LEFT 10
-#define BTN_ROTATE_RIGHT 11
-#define BTN_DEBOUNCE_TIME 70
+
+
+// Which index on the shift register the button is
+// so you can use button_state[BTN_LEFT_IDX] to get the state of that button.
+#define BTN_LEFT_IDX 0
+#define BTN_RIGHT_IDX 1
+#define BTN_ROTATE_LEFT_IDX 2
+#define BTN_ROTATE_RIGHT_IDX 3
