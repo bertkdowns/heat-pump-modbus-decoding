@@ -1,17 +1,18 @@
 // #include <array>
 #include "piece.h"
 #include "shuffle.h"
-#define CLK 3
-#define SIN1 4
-#define SIN2 5
-#define SIN3 6
-#define LATCH 7
+#include "buttons.h"
+#define SIN1 2
+#define SIN2 3
+#define SIN3 4
+#define CLK 5 // note: changed clock pin
+#define LATCH 6
 
 #define BTN_LEFT 8
 #define BTN_RIGHT 9
 #define BTN_ROTATE_LEFT 10
 #define BTN_ROTATE_RIGHT 11
-#define BTN_DEBOUNCE_TIME 100
+#define BTN_DEBOUNCE_TIME 70
 
 int update_time = 300;
 int prev_time = 0;
@@ -29,7 +30,8 @@ int time_since[4] = { 0, 0, 0, 0 };
 
 
 TetrisPiece current_piece = TetrisPiece();
-
+TetrisPiece hold_piece = TetrisPiece();
+// store the hold piece number
 void handle_buttons(){
   current_time = millis();
   if (digitalRead(BTN_LEFT) == LOW && current_time - time_since[0] > BTN_DEBOUNCE_TIME) {
@@ -67,6 +69,9 @@ void setup() {
   current_piece.y = 8;
 
   current_piece.switchPiece(T);
+  hold_piece.x = 0;
+  hold_piece.y = 0;
+  hold_piece.hide();
 }
 
 void loop() {
@@ -80,7 +85,13 @@ void loop() {
   update_display();
 }
 
+void switch_held_piece(){
+  TetrisPiece tmp = current_piece;
+}
+
 void update_game() {
+  get_button_state();
+  print_button_state();
   current_piece.hide(); // hide so it doesn't collide with itself
   if(current_piece.is_colliding(current_piece.x, current_piece.y + 1)){
     // We leave the piece there and don't get rid of it.
@@ -119,8 +130,8 @@ void update_display() {
       } else {
         digitalWrite(SIN1, LOW);
       }
-      digitalWrite(SIN2, display_data[col_to_show][row_n]); // Write the appropriate data for this column
-      digitalWrite(SIN3, display_data[col_to_show][row_n+16]); // Write the appropriate data for this column
+      digitalWrite(SIN3, display_data[col_to_show][row_n]); // Write the appropriate data for this column
+      digitalWrite(SIN2, display_data[col_to_show][row_n+16]); // Write the appropriate data for this column
       // pulse the clock
       digitalWrite(CLK, HIGH);
       // cpu delay is long enough
@@ -146,6 +157,7 @@ void clear_rows() {
       for (int x = 0; x < 16; x++) {
         display_data[x][y] = false;
       }
+      update_time = update_time * 0.9;
       shift_rows_down(y);
     }
   }
