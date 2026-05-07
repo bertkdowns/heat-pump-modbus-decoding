@@ -2,7 +2,7 @@
 #include "shuffle.h"
 #include "display.h"
 #include "buttons.h"
-
+#include "buzzer.h"
 int prev_time = 0;
 int current_time = 0;
 
@@ -66,6 +66,7 @@ void loop() {
     prev_time = current_time;
   }
   handleButtons();
+  buzzerLoop();
   
   updateDisplay();
 }
