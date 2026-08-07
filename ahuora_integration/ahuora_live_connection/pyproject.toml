@@ -1,0 +1,12 @@
+[project]
+name = "ahuora-live-connection"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "ahuora-live"]
+
+
+[tool.uv.sources]
+"ahuora-live" = { path = "/Scratch/Ahuora-Live", editable = true }

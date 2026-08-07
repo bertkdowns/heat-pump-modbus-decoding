@@ -39,7 +39,7 @@ services:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     environment:
       INFLUX_TOKEN: supersecrettoken
-    command: ["telegraf", "--config", "/etc/telegraf/telegraf.conf", "--debug"]
+    command: ["telegraf", "--config", "/etc/telegraf/telegraf.conf"]
 
   homeassistant:
     container_name: homeassistant
