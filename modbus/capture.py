@@ -6,6 +6,9 @@ from mqtt_adapter import MQTTAdapter
 # -----------------------------
 # Configuration
 # -----------------------------
+# This script uses a USB to RS485 adapter to capture Modbus RTU packets and publish them to an MQTT broker.
+# Note that we don't have a USB to RS485, so we go RS485 to RS232, then we short RST to GND on an arduino to use it
+# as a USB to RS232 adapter. No programming of the arduino is needed.
 SERIAL_PORT = "/dev/serial/by-id/usb-DFRobot_www.dfrobot.com__0043_34330313431351700141-if00"   # /dev/ttyACM0, Change as needed
 BAUDRATE = 4800               # Modbus RTU baud
 MESSAGE_GAP_TIMEOUT = 0.005   # 5 ms
